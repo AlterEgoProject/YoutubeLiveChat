@@ -1,18 +1,24 @@
 from getChat import GetChat
 import typeKey
-import putSerial
+from putSerial import PutSerial
 
-import sys
+import argparse
 import time
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('port')
+    parser.add_argument('v')
+    args = parser.parse_args()
+
+    # v = 'J1pBGkQI8aY'
     # if len(sys.argv) == 1:
-    v = 'J1pBGkQI8aY'
     # else:
     #     v = sys.argv[1]
-    target_url = 'https://www.youtube.com/live_chat?v=' + v
+    target_url = 'https://www.youtube.com/live_chat?v=' + args.v
     timestamp = None
     gc = GetChat(target_url, timestamp)
+    ps = PutSerial(args.port)
     while(1):
         if gc.old_timestamp == None:
             chats = gc.get()
@@ -22,7 +28,7 @@ def main():
         for chat in chats:
             text = chat[1]
             # typeKey.press_key(text)
-            putSerial.press_key(text)
+            ps.press_key(text)
             print(chat[0], text)
         if len(chats)==0:
             time.sleep(1)
