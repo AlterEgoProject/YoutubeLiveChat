@@ -29,7 +29,7 @@ class PutSerial:
     def __init__(self, port):
         self.ser = serial.Serial(port, 9600)
 
-    def send(self, msg, duration=0.1):
+    def send(self, msg, duration=0.2):
         print(msg)
         self.ser.write(f'{msg}\r\n'.encode('utf-8'))
         sleep(duration)
