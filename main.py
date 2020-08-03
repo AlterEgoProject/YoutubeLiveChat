@@ -31,8 +31,8 @@ def main():
             zero_chat_counter = 0
             text = chat[1]
             # typeKey.press_key(text)
-            ps.press_key(text)
             print(chat[0], text)
+            ps.press_key(text)
         if len(chats)==0:
             time.sleep(1)
             zero_chat_counter += 1
