@@ -4,6 +4,7 @@ from putSerial import PutSerial
 
 import argparse
 import time
+import random
 
 def main():
     parser = argparse.ArgumentParser()
@@ -19,6 +20,7 @@ def main():
     timestamp = None
     gc = GetChat(target_url, timestamp)
     ps = PutSerial(args.port)
+    zero_chat_counter = 0
     while(1):
         if gc.old_timestamp == None:
             chats = gc.get()
@@ -26,12 +28,19 @@ def main():
         chats = gc.get()
         # print(len(chats))
         for chat in chats:
+            zero_chat_counter = 0
             text = chat[1]
             # typeKey.press_key(text)
             ps.press_key(text)
             print(chat[0], text)
         if len(chats)==0:
             time.sleep(1)
+            zero_chat_counter += 1
+            if zero_chat_counter > 60 * 5:
+                ps.press_key('b')
+                rand_direction = random.choice(['2', '4', '6', '8'])
+                ps.press_key(rand_direction * 5)
+                ps.press_key('y')
 
 if __name__ == '__main__':
     main()
