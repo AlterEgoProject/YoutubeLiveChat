@@ -47,6 +47,8 @@ def main():
             if zero_chat_counter > 60 * 2:
                 beep(2000)
                 beep(2000)
+                beep(2000)
+                beep(2000)
             zero_chat_counter = 0
             text = chat[1]
             # typeKey.press_key(text)
@@ -55,11 +57,13 @@ def main():
         if len(chats)==0:
             time.sleep(1)
             zero_chat_counter += 1
-            if zero_chat_counter > 60 * 5:
-                ps.press_key('b')
-                rand_direction = random.choice(['2', '4', '6', '8'])
-                ps.press_key(rand_direction * 3)
-                ps.press_key('y')
+            if zero_chat_counter > 60 * 2:
+                # ランダムウォーク
+                rand_direction = random.choice(['2', '4', '6', '8']) * 3
+                ps.press_key('b' + rand_direction + 'y')
+                # 祈り
+                # ps.press_key('da')
+
 
 if __name__ == '__main__':
     main()

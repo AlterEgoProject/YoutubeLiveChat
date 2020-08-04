@@ -2,6 +2,11 @@ import argparse
 import serial
 from time import sleep
 
+ZEN = "".join(chr(0xff01 + i) for i in range(94))
+HAN = "".join(chr(0x21 + i) for i in range(94))
+
+ZEN2HAN = str.maketrans(ZEN, HAN)
+
 keys_list = {
     'a': 'Button A',
     'b': 'Button B',
@@ -30,6 +35,7 @@ class PutSerial:
         self.ser = serial.Serial(port, 9600)
 
     def send(self, msg, duration=0.2):
+        msg = msg.translate(ZEN2HAN).lower()
         print(msg)
         self.ser.write(f'{msg}\r\n'.encode('utf-8'))
         sleep(duration)
