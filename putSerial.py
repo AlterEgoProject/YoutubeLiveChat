@@ -35,13 +35,13 @@ class PutSerial:
         self.ser = serial.Serial(port, 9600)
 
     def send(self, msg, duration=0.2):
-        msg = msg.translate(ZEN2HAN).lower()
         print(msg)
         self.ser.write(f'{msg}\r\n'.encode('utf-8'))
         sleep(duration)
         self.ser.write(b'RELEASE\r\n')
 
     def press_key(self, keys):
+        keys = keys.translate(ZEN2HAN).lower()
         # if len(keys) > 10:
         #     return
         for key in keys:
