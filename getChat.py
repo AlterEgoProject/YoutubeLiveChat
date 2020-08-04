@@ -36,7 +36,7 @@ class GetChat:
 
         # dics["contents"]["liveChatRenderer"]["actions"]がコメントデータのリスト。
         comment_data = []
-        timestamp = None
+        timestamp = self.old_timestamp
         # try:
         for samp in dics["contents"]["liveChatRenderer"]["actions"]:
             try:
