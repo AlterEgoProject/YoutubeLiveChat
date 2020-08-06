@@ -42,10 +42,10 @@ class PlotWindow:
         return vol
 
 if __name__=="__main__":
-    import conecctOBS
+    import connectOBS
     plotwin=PlotWindow()
     plotwin.update()
-    ow = conecctOBS.ObsWebsket()
+    ow = connectOBS.ObsWebsket()
     while True:
         vol = plotwin.update()
         if vol > 5:
