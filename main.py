@@ -23,6 +23,7 @@ def main():
     gc = GetChat(target_url, timestamp)
     ps = PutSerial(args.port)
     zero_chat_counter = 0
+    flag = 'randomwark'
     while(1):
         if gc.old_timestamp == None:
             chats = gc.get()
@@ -37,18 +38,30 @@ def main():
                 beep.beep(2000)
             zero_chat_counter = 0
             text = chat[1]
-            # typeKey.press_key(text)
+            if text == 'randomwark':
+                print('Mode randomwark')
+                flag = 'randomwark'
+            elif text == 'shootingstar':
+                print('Mode shootingstar')
+                flag = 'shootingstar'
+            else:
+                # typeKey.press_key(text)
+                ps.press_key(text)
             print(chat[0], text)
-            ps.press_key(text)
         if len(chats)==0:
-            time.sleep(1)
             zero_chat_counter += 1
             if zero_chat_counter > 60 * 2:
                 # ランダムウォーク
-                rand_direction = random.choice(['2', '4', '6', '8']) * 3
-                ps.press_key('b' + rand_direction + 'y')
+                if flag == 'randomwark':
+                    time.sleep(0.3)
+                    ps.press_key('b' + random.choice(['2', '4', '6', '8']) * 3 + 'y')
+                    time.sleep(0.5)
+                    ps.press_key('b' + random.choice(['2', '4', '6', '8']) * 3 + 'y')
                 # 祈り
-                # ps.press_key('da')
+                elif flag == 'shootingstar':
+                    ps.press_key('sda')
+            else:
+                time.sleep(1)
 
 
 if __name__ == '__main__':
