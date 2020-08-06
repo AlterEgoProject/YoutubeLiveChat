@@ -14,10 +14,6 @@ def main():
     parser.add_argument('port')
     args = parser.parse_args()
 
-    # v = 'J1pBGkQI8aY'
-    # if len(sys.argv) == 1:
-    # else:
-    #     v = sys.argv[1]
     target_url = 'https://www.youtube.com/live_chat?v=' + get_live_url()
     timestamp = None
     gc = GetChat(target_url, timestamp)
@@ -38,6 +34,7 @@ def main():
                 beep.beep(2000)
             zero_chat_counter = 0
             text = chat[1]
+            print(chat[0], text)
             if text == 'randomwark':
                 print('Mode randomwark')
                 flag = 'randomwark'
@@ -47,7 +44,6 @@ def main():
             else:
                 # typeKey.press_key(text)
                 ps.press_key(text)
-            print(chat[0], text)
         if len(chats)==0:
             zero_chat_counter += 1
             if zero_chat_counter > 60 * 2:
