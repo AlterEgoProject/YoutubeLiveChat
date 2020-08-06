@@ -35,9 +35,9 @@ def main():
             zero_chat_counter = 0
             text = chat[1]
             print(chat[0], text)
-            if text == 'randomwark':
-                print('Mode randomwark')
-                flag = 'randomwark'
+            if text == 'randomwalk':
+                print('Mode randomwalk')
+                flag = 'randomwalk'
             elif text == 'shootingstar':
                 print('Mode shootingstar')
                 flag = 'shootingstar'
@@ -48,7 +48,7 @@ def main():
             zero_chat_counter += 1
             if zero_chat_counter > 60 * 2:
                 # ランダムウォーク
-                if flag == 'randomwark':
+                if flag == 'randomwalk':
                     time.sleep(0.3)
                     ps.press_key('b' + random.choice(['2', '4', '6', '8']) * 3 + 'y')
                     time.sleep(0.5)
