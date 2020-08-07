@@ -19,7 +19,7 @@ def main():
     gc = GetChat(target_url, timestamp)
     ps = PutSerial(args.port)
     zero_chat_counter = 0
-    flag = 'randomwark'
+    flag = 'randomwalk'
     while(1):
         if gc.old_timestamp == None:
             gc.get()
@@ -46,7 +46,7 @@ def main():
                 ps.press_key(text)
         if len(chats)==0:
             zero_chat_counter += 1
-            if zero_chat_counter > 1:#60 * 2:
+            if zero_chat_counter > 60 * 2:
                 # ランダムウォーク
                 if flag == 'randomwalk':
                     time.sleep(0.3)
@@ -55,7 +55,7 @@ def main():
                     ps.press_key('b' + random.choice(['2', '4', '6', '8']) * 3 + 'y')
                 # 祈り
                 elif flag == 'shootingstar':
-                    ps.press_key('sda')
+                    ps.press_key('sua')
             else:
                 time.sleep(1)
 
