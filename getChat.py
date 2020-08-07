@@ -65,7 +65,7 @@ class GetChat:
 #     writer.writerows(comment_data)
 
 if __name__ == '__main__':
-    v = '4BE8yy0PAn0'
+    v = 'KQl98a16xzQ'
     target_url = 'https://www.youtube.com/live_chat?v=' + v
     timestamp = None
     gc = GetChat(target_url, timestamp)

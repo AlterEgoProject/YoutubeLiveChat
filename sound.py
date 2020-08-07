@@ -37,8 +37,8 @@ class PlotWindow:
             ret = self.stream.read(self.CHUNK)
             ret = np.frombuffer(ret, dtype="int16") / 32768.0
             data = np.concatenate([data, ret])
-        vol = int(round(data.max()*100))
-        print('\r{}'.format(vol), end='')
+        vol = int(round(data.max() * 100))
+        print('\r{}      '.format(vol), end='')
         return vol
 
 if __name__=="__main__":

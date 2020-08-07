@@ -22,7 +22,7 @@ def main():
     flag = 'randomwark'
     while(1):
         if gc.old_timestamp == None:
-            chats = gc.get()
+            gc.get()
             continue
         chats = gc.get()
         # print(len(chats))
@@ -46,7 +46,7 @@ def main():
                 ps.press_key(text)
         if len(chats)==0:
             zero_chat_counter += 1
-            if zero_chat_counter > 60 * 2:
+            if zero_chat_counter > 1:#60 * 2:
                 # ランダムウォーク
                 if flag == 'randomwalk':
                     time.sleep(0.3)
