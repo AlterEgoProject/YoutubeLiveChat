@@ -25,7 +25,7 @@ keys_list = {
     '3': Direction(Stick.LEFT, -45, showName='DOWN_RIGHT'),
     '4': Direction(Stick.LEFT, -180, showName='LEFT'),
     '6': Direction(Stick.LEFT, 0, showName='RIGHT'),
-    '7': Direction(Stick.LEFT, -135, showName='DOWN_LEFT'),
+    '7': Direction(Stick.LEFT, 135, showName='UP_LEFT'),
     '8': Direction(Stick.LEFT, 90, showName='UP'),
     '9': Direction(Stick.LEFT, 45, showName='UP_RIGHT'),
     'l': Button.L,
@@ -36,10 +36,13 @@ keys_list = {
     'd': Direction(Stick.RIGHT, -90, showName='DOWN'),
     'p': Button.PLUS,
 }
+
+
 class Dammy:
     @staticmethod
     def get():
         return False
+
 
 class PutSerial:
     def __init__(self, port):
@@ -67,9 +70,35 @@ class PutSerial:
         keys = keys.translate(ZEN2HAN).lower()
         # if len(keys) > 10:
         #     return
-        for key in keys:
+        for i in range(len(keys)):
+            key = keys[i]
+            hold_key = []
             if key in keys_list.keys():
-                self.command.press(keys_list[key], 0.2, 0)
+                # -:1秒継続
+                # .:0.2秒待機
+                duration = 0.2
+                wait_sec = 0
+                for j in range(i, len(keys)):
+                    if keys[j] == '-':
+                        if wait_sec > 0:
+                            break
+                        duration += 1
+                    elif keys[j] == '.':
+                        wait_sec += 0.2
+                    else:
+                        break
+                # (:直前のボタンをホールド
+                # ):ホールドを解除
+                if i < len(keys) - 1 and keys[i+1] == '(':
+                    hold_key.append(key)
+                    self.command.hold(keys_list[key])
+                elif i < len(keys) - 1 and keys[i+1] == ')':
+                    if len(hold_key) > 0:
+                        self.command.holdEnd(hold_key.pop())
+                else:
+                    self.command.press(keys_list[key], duration, wait_sec)
+
+
 
 # try:
 #     while True:
