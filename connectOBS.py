@@ -27,6 +27,15 @@ class ObsWebsket:
         file = path + '/image/vol_{}.png'.format(str(vol))
         self.ws.call(requests.SetSourceSettings('sound', sourceSettings={'file': file}))
 
+    def set_fish_icon_visible(self):
+        # file = path +'simple_fish.png'
+        self.ws.call(requests.SetSceneItemProperties('fish', visible=True))
+
+    def set_fish_icon_invisible(self):
+        # file = path +'simple_fish.png'
+        self.ws.call(requests.SetSceneItemProperties('fish', visible=False))
+
+
 if __name__ == '__main__':
     ws = ObsWebsket()
     ws.now_here(True)

@@ -21,6 +21,7 @@ def main():
     zero_chat_counter = 0
     flag = 'randomwalk'
     while(1):
+        # try:
         if gc.old_timestamp == None:
             gc.get()
             continue
@@ -58,6 +59,8 @@ def main():
                     ps.press_key('sua')
             else:
                 time.sleep(1)
+        # except Exception as e:
+        #     print(e)
 
 
 if __name__ == '__main__':

@@ -68,18 +68,21 @@ class PutSerial:
 
     def press_key(self, keys):
         keys = keys.translate(ZEN2HAN).lower()
-        # if len(keys) > 10:
-        #     return
+        if len(keys) > 30:
+            print('over 30 characters!')
+            return
+        hold_key = []
         for i in range(len(keys)):
             key = keys[i]
-            hold_key = []
             if key in keys_list.keys():
                 # -:1秒継続
                 # .:0.2秒待機
                 duration = 0.2
                 wait_sec = 0
                 for j in range(i, len(keys)):
-                    if keys[j] == '-':
+                    if i == j:
+                        continue
+                    elif keys[j] == '-':
                         if wait_sec > 0:
                             break
                         duration += 1
@@ -89,14 +92,17 @@ class PutSerial:
                         break
                 # (:直前のボタンをホールド
                 # ):ホールドを解除
-                if i < len(keys) - 1 and keys[i+1] == '(':
-                    hold_key.append(key)
+                if i < len(keys) - 1 and keys[i+1] == '(' and key not in ['b']:
+                    hold_key.append(keys_list[key])
                     self.command.hold(keys_list[key])
-                elif i < len(keys) - 1 and keys[i+1] == ')':
-                    if len(hold_key) > 0:
-                        self.command.holdEnd(hold_key.pop())
                 else:
                     self.command.press(keys_list[key], duration, wait_sec)
+            elif key == ')':
+                if len(hold_key) > 0:
+                    self.command.holdEnd(hold_key.pop())
+        for key in hold_key:
+            self.command.holdEnd(key)
+
 
 
 
@@ -107,6 +113,7 @@ class PutSerial:
 # except KeyboardInterrupt:
 #     send('RELEASE')
 #     ser.close()
+
 
 if __name__ == '__main__':
     import time

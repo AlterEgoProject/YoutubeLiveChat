@@ -58,10 +58,10 @@ class GetChat:
         return comment_data
 
 
-# import csv
+# import data
 # # comment_data.txt にコメントデータを書き込む
 # with open("comment_data.txt", mode='w', encoding="utf-8") as f:
-#     writer = csv.writer(f, lineterminator='\n')
+#     writer = data.writer(f, lineterminator='\n')
 #     writer.writerows(comment_data)
 
 if __name__ == '__main__':
