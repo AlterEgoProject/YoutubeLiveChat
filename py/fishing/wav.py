@@ -98,6 +98,7 @@ class Wav:
     def __init__(self):
         base_path = os.path.dirname(__file__)
         self.param = np.loadtxt(base_path + '/parameter.csv', delimiter=",", dtype=float)
+        self.param = self.param / np.sum(self.param)
         self.before_err = np.sum(np.square(self.param))
         self.data = np.zeros((8, 1024))
 
@@ -105,6 +106,7 @@ class Wav:
         amp = np.array(fft_proccess(ret))
         self.data = np.roll(self.data, 1, axis=0)
         self.data[0] = amp
+        self.data = self.data / np.sum(self.data)
         err = np.square(self.param - self.data)
         err = np.array([corr[i] * err[i] for i in range(8)])
         diff = self.before_err - np.sum(err)
@@ -146,4 +148,24 @@ def cal_error():
         show()
 
 
-# cal_error()
+from glob import glob
+def record_data():
+    peak_vol = 0.15
+    for file in glob('record/*.wav'):
+        print(file)
+        data = extract(file[:-4])[0]
+        l = 1024
+        block = []
+        for i in range(int(len(data)/l - 1)):
+            # print(i)
+            section_data = data[l*i:l*(i+2)]
+            # section_data = data
+            block.append(np.sum(np.abs(section_data)))
+            # plot(section_data)
+            # show()
+            # break
+        plot(block)
+        show()
+
+
+record_data()
