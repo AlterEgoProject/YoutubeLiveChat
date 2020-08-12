@@ -71,7 +71,7 @@ class PutSerial:
         if len(keys) > 30:
             print('over 30 characters!')
             return
-        hold_key = []
+        hold_key = None
         for i in range(len(keys)):
             key = keys[i]
             if key in keys_list.keys():
@@ -93,17 +93,17 @@ class PutSerial:
                 # (:直前のボタンをホールド
                 # ):ホールドを解除
                 if i < len(keys) - 1 and keys[i+1] == '(' and key not in ['b']:
-                    hold_key.append(keys_list[key])
-                    self.command.hold(keys_list[key])
+                    if hold_key is None:
+                        hold_key = keys_list[key]
+                        self.command.hold(keys_list[key])
                 else:
                     self.command.press(keys_list[key], duration, wait_sec)
             elif key == ')':
-                if len(hold_key) > 0:
-                    self.command.holdEnd(hold_key.pop())
-        for key in hold_key:
-            self.command.holdEnd(key)
-
-
+                if hold_key is not None:
+                    self.command.holdEnd(hold_key)
+                    hold_key = None
+        if hold_key is not None:
+            self.command.holdEnd(hold_key)
 
 
 # try:

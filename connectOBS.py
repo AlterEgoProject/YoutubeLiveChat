@@ -35,7 +35,19 @@ class ObsWebsket:
         # file = path +'simple_fish.png'
         self.ws.call(requests.SetSceneItemProperties('fish', visible=False))
 
+    def set_text(self, name, msg):
+        self.ws.call(requests.SetSourceSettings(name, {'text': msg}))
+
+    def get_snap(self):
+        import base64
+        ts = ws.ws.call(requests.TakeSourceScreenshot('Aver', embedPictureFormat='jpeg'))
+        im = ts.getImg()
+        image = Image.open(BytesIO(base64.b64decode(im.replace('data:image/jpeg;base64,', ''))))
+        image.show()
+
 
 if __name__ == '__main__':
+    from PIL import Image
+    from io import BytesIO
     ws = ObsWebsket()
-    ws.now_here(True)
+    ws.now_here(False)
