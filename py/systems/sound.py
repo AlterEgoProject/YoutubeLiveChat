@@ -1,11 +1,10 @@
 import numpy as np
-import sys
 import pyaudio
 import wave
 import threading
 import time
 
-import connectOBS
+from systems import connectOBS
 from py.fishing.wav import Wav
 
 

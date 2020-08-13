@@ -1,9 +1,8 @@
-from getURL import get_live_url
-from getChat import GetChat
-import typeKey
-from putSerial import PutSerial
-from sound import PlotWindow
-import beep
+from systems.getURL import get_live_url
+from systems.getChat import GetChat
+from systems.putSerial import PutSerial
+from systems.sound import PlotWindow
+from others import beep, line
 
 import argparse
 import time
@@ -91,7 +90,6 @@ def main():
 
 
 if __name__ == '__main__':
-    import line
     import sys
     flag = True
     while(1):

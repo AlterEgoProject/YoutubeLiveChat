@@ -1,11 +1,9 @@
 from bs4 import BeautifulSoup
-import json
 import requests
 
-import time
 from datetime import datetime, timedelta
 import random
-import connectOBS
+from systems import connectOBS
 
 exclude_list = [
 ]
