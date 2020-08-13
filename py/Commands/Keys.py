@@ -247,7 +247,7 @@ class KeyPress:
 				btns.append(btn)
 
 		# print to log
-		print(btns)
+		# print(btns)
 
 		self.format.setButton([btn for btn in btns if type(btn) is Button])
 		self.format.setHat([btn for btn in btns if type(btn) is Hat])

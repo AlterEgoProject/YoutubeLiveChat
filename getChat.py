@@ -9,8 +9,8 @@ import connectOBS
 
 exclude_list = [
 ]
-CANTIDATE_MIN = 5
-VALIDATE_SEC = 30
+CANTIDATE_MIN = 2
+VALIDATE_SEC = 20
 LIMIT_MIN = 5
 
 
@@ -112,6 +112,7 @@ class GetChat:
             # 選ばれた人は 5分間操作ができて、そのticket操作権を誰かに譲渡することもできる
             # 初め30秒間チャットがない場合は再びランダム抽選が行われる
             t_delta = now_time - self.selected_time
+            afk_delta = 0
             if len(self.name_list) < 2:
                 self.ticket = None
                 msg = 'free play'

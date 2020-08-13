@@ -60,6 +60,9 @@ def main():
                 t = threading.Thread(target=plotwin.fishing)
                 t.start()
                 tread_list.append(t)
+            elif text == 'rock':
+                for _ in range(30):
+                    ps.press_key('a.')
             else:
                 for tread in tread_list:
                     tread.do_run = True
@@ -69,15 +72,18 @@ def main():
         if len(chats)==0:
             zero_chat_counter += 1
             if zero_chat_counter > 60 * 2:
+                # if is_map_appear():
                 # ランダムウォーク
                 if afk == 'randomwalk':
+                    print('\rランダムウォーク (歩いて拾う)', end='')
                     ps.press_key('b' + random.choice(['2', '4', '6', '8']) * 2 + 'y' +
                                  random.choice(['2', '4', '6', '8']) * 2 + 'y' +
                                  random.choice(['2', '4', '6', '8']) * 2 + 'y' +
                                  random.choice(['2', '4', '6', '8']) * 2 + 'y')
                 # 祈り
                 elif afk == 'shootingstar':
-                    ps.press_key('sua')
+                    print('\r流れ星モード (uba)', end='')
+                    ps.press_key('uba')
             else:
                 time.sleep(1)
         # except Exception as e:
