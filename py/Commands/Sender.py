@@ -40,6 +40,7 @@ class Sender:
 			print(e)
 		except AttributeError:
 			print('Attempting to use a port that is not open')
+			raise
 
 		# Show sending serial datas
 		if self.is_show_serial.get():

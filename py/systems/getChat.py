@@ -3,7 +3,7 @@ import requests
 
 from datetime import datetime, timedelta
 import random
-from systems import connectOBS
+from py.systems import connectOBS
 
 exclude_list = [
 ]

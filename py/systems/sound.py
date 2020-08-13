@@ -4,7 +4,7 @@ import wave
 import threading
 import time
 
-from systems import connectOBS
+from py.systems import connectOBS
 from py.fishing.wav import Wav
 
 

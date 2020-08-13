@@ -46,8 +46,15 @@ class Dammy:
 
 class PutSerial:
     def __init__(self, port):
-        self.sender = Sender(Dammy)
-        self.sender.openSerial(port)
+        for _ in range(5):
+            self.sender = Sender(Dammy)
+            if self.sender.openSerial(port):
+                break
+            else:
+                sleep(1)
+                continue
+        else:
+            raise
         # self.unitcommand = UnitCommand()
         # self.unitcommand.start(self.sender)
         # self.keypress = KeyPress(self.sender)
