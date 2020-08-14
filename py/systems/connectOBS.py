@@ -24,6 +24,8 @@ class ObsWebsket:
         self.ws.connect()
         size = 1920, 1080
 
+
+
     def now_here(self, msg):
         if msg:
             # file = path + 'here.png'
@@ -65,10 +67,12 @@ class ObsWebsket:
 
     def detect_clam(self, image):
         gray_image = image.convert('L')
+        hist = gray_image.histogram()
+
         s = 0
         i = 0
-        half = sum(gray_image.histogram()) / 2
-        for val in gray_image.histogram():
+        half = sum(hist) / 2
+        for val in hist:
             s += val
             if s > half:
                 half_i = i
@@ -102,22 +106,22 @@ class ObsWebsket:
                     crop_range2 = (i * 100 - 50, j * 100 - 50, (i + 1) * 100 + 50, (j + 1) * 100 + 50)
                     croped2 = bi_image.crop(crop_range2)
                     if croped1.entropy() > croped2.entropy():
-                        candidate.append((i, j, croped1, croped1.entropy(), croped2.entropy()))
+                        candidate.append((i, j, crop_range1, croped1.entropy(), croped2.entropy()))
                         # r = patches.Rectangle(xy=(100*i, 100*j), width=100, height=100, ec='r', fill=False)
                         # ax.add_patch(r)
         if len(candidate) > 0:
             max_mean = 0
             max_i = 0
-            croped = None
+            crop_range1 = None
             ent = 0
             for i in range(len(candidate)):
                 sum_croped = np.mean(np.asarray(candidate[i][2]))
                 if max_mean < sum_croped:
                     max_mean = sum_croped
                     max_i = i
-                    croped = candidate[i][2]
+                    crop_range1 = np.mean(np.asarray(gray_image.crop(candidate[i][2])))
                     ent = round(candidate[i][3], 4)
-            print('\navr:{}, thr:{}, ent:{}'.format(int(max_mean), threshold, ent))
+            print('\navr:{}, thr:{}, ent:{}'.format(int(crop_range1), threshold, ent))
             self.ws.call(requests.SetSceneItemPosition('red_target', x=candidate[max_i][0]*100, y=candidate[max_i][1]*100))
             self.set_icon_visible('red_target')
             # plt.imshow(croped, cmap="gray")
@@ -162,7 +166,17 @@ class ObsWebsket:
 
 if __name__ == '__main__':
     self = ObsWebsket()
-    image = self.get_snap()
+    fig = plt.figure()
+    ax = plt.axes()
+    ax.set_ylim((0, 50000))
+    for _ in range(10):
+        image = self.get_snap()
+        # line1, = ax.plot(image.convert('L').histogram(), color='gray')
+        upside = np.asarray(image.convert("RGB")).
+        img = np.asarray(image.convert("RGB")).reshape(-1, 3)
+        ax.hist(img, color=["red", "green", "blue"], histtype="step", bins=256)
+        plt.pause(1)
+        ax.clear()
     print(self.light_distribution(image))
 
 # i, j = 5, 5

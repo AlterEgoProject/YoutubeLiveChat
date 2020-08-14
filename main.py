@@ -10,6 +10,10 @@ import time
 import random
 import threading
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+ps = None
 
 def main():
     parser = argparse.ArgumentParser()
@@ -25,6 +29,11 @@ def main():
     pw = PlotWindow()
     volume_tread = threading.Thread(target=pw.start)
     volume_tread.start()
+
+    # fig = plt.figure()
+    # ax = plt.axes()
+    # plt.pause(0.01)
+    # ax.set_ylim((0, 50000))
 
     zero_chat_counter = 0
     afk = 'sandplay'  # 'shootingstar'  # 'randomwalk' 'sandplay'
@@ -81,8 +90,13 @@ def main():
             zero_chat_counter += 1
             if zero_chat_counter > 60 * 2:
                 first_image = ow.get_snap()
+                # line, = ax.plot(first_image.convert('L').histogram(), color='blue')
+                # img = np.asarray(first_image.convert("RGB")).reshape(-1, 3)
+                # ax.hist(img, color=["red", "green", "blue"], histtype="step", bins=256)
+                # plt.pause(0.01)
                 ow.detect_clam(first_image)
                 time.sleep(1)
+                # ax.clear()
                 is_field = ow.is_field()
                 ow.set_icon_invisible('red_target')
 
@@ -156,6 +170,11 @@ if __name__ == '__main__':
         except Exception as e:
             beep.beep(2000, 200)
             tb = sys.exc_info()[2]
+            try:
+                if ps.sender.isOpened():
+                    ps.sender.closeSerial()
+            except:
+                pass
             print('{0}\nエラー、5秒後再起動します'.format(e.with_traceback(tb)))
             time.sleep(5)
             if flag:
