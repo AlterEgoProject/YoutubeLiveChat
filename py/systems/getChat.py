@@ -61,14 +61,11 @@ class GetChat:
         # try:
         for samp in dics["contents"]["liveChatRenderer"]["actions"]:
             try:
-                temp = samp['addChatItemAction']['item']['liveChatTextMessageRenderer']
-                timestamp = temp['timestampUsec']
-                text = temp['message']['runs'][0]['text']
+                timestamp, text, name, name_id = self.extract_comment(samp)
+
                 # print(text)
                 if '#' in text or '＃' in text:
                     continue
-                name = temp['authorName']['simpleText']
-                name_id = temp['id']
                 delta_sec = datetime.now().timestamp() - int(timestamp)/1000/1000
                 # print(temp['message']['runs'][0]['text'])
                 if delta_sec < 60 * CANTIDATE_MIN:
@@ -78,29 +75,25 @@ class GetChat:
                     if name in exclude_list:
                         continue
                     # print(self.ticket is None, self.ticket == name)
-                    if self.ticket is None or self.ticket == name:
-                        if self.ticket == name:
-                            # チケット有効化
-                            self.afk_time = datetime.now()
-                            if text[:4] == 'pass' or text[:2] == 'パス':
-                                name_list_temp = set(self.name_list)
-                                name_list_temp.discard(self.ticket)
-                                self.name_list = list(name_list_temp)
-                                if text[:4] == 'pass':
-                                    pass_index = 4
-                                else:
-                                    pass_index = 2
-                                if len(text) > pass_index and text[pass_index:] in self.name_list:
-                                    self.ticket = text[pass_index:]
-                                else:
-                                    if len(self.name_list) == 0:
-                                        self.ticket = None
-                                    else:
-                                        self.ticket = random.choice(self.name_list)
-                            else:
-                                self.ticket_flag = True
+                    if self.ticket is None:
                         comment_data.append([timestamp, text, name, name_id])
-                        self.old_timestamp = timestamp
+                    elif self.ticket == name:
+                        # チケット有効化
+                        self.afk_time = datetime.now()
+                        if text[:4] == 'pass' or text[:2] == 'パス':
+                            name_list_temp = set(self.name_list)
+                            name_list_temp.discard(self.ticket)
+                            self.name_list = list(name_list_temp)
+                            if text[:4] == 'pass':
+                                pass_index = 4
+                            else:
+                                pass_index = 2
+                            self.issue_ticket(text[pass_index:])
+
+                        else:
+                            self.ticket_flag = True
+                            comment_data.append([timestamp, text, name, name_id])
+                    # self.old_timestamp = timestamp
             except Exception as e:
                 # print(e, samp)
                 continue
@@ -119,8 +112,8 @@ class GetChat:
             # まずチャット欄の直近5分からランダムに一人選ぶ(何度チャットしていても確率は変わらない)
             # 選ばれた人は 5分間操作ができて、そのticket操作権を誰かに譲渡することもできる
             # 初め30秒間チャットがない場合は再びランダム抽選が行われる
-            t_delta = now_time - self.selected_time
-            afk_delta = now_time - self.afk_time
+            t_delta = abs(now_time - self.selected_time)
+            afk_delta = abs(now_time - self.afk_time)
 
             # チケットの失効により誰かに代わる
             if self.ticket is None or t_delta > timedelta(minutes=LIMIT_MIN) or \
@@ -131,8 +124,7 @@ class GetChat:
                     name_list_temp.discard(self.ticket)
                     self.name_list = list(name_list_temp)
                 # 代わる人を決める
-                if len(self.name_list) > 0:
-                    self.ticket = random.choice(self.name_list)
+                self.issue_ticket()
 
                 # 新しいチケット発行
                 self.ticket_flag = False
@@ -161,7 +153,25 @@ class GetChat:
         # print(msg)
         # print(self.ticket)
         self.ow.set_text('message', msg)
+        # self.ow.set_text('message', '調整中。ごめんね！')
         return comment_data
+
+    def issue_ticket(self, name=''):
+        if len(self.name_list) == 0:
+            self.ticket = None
+        elif name in self.name_list:
+            self.ticket = name
+        else:
+            self.ticket = random.choice(self.name_list)
+
+    def extract_comment(self, samp):
+        temp = samp['addChatItemAction']['item']['liveChatTextMessageRenderer']
+        timestamp = temp['timestampUsec']
+        text = temp['message']['runs'][0]['text']
+        name = temp['authorName']['simpleText']
+        name_id = temp['id']
+        return timestamp, text, name, name_id
+
 
 
 # import data

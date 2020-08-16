@@ -52,33 +52,11 @@ class PlotWindow:
             self.ow.set_sound_vol(vol)
             continue
 
-    def fft_check(self, ret):
-        error = self.wav.is_fishing(ret)
-        error *= 1000
-        # error = max(0, -error)
-        if self.flag_count < 10:
-            self.flag_count += 1
-            self.rec_vol.append(error)
-            # time.sleep(0.1)
-        elif self.flag_count == 10:
-            self.ow.set_fish_icon_invisible()
-            self.flag_count += 1
-            self.ow.set_text('fishing', str(int(max(self.rec_vol))))
-            # print("\r " + str(int(max(self.rec_vol))) + '  ', end="")
-            print('\r : {:>6.2f} {:>6.2f}'.format(max(self.rec_vol), min(self.rec_vol)), end="")
-        # elif error > 30:
-        else:
-            self.flag_count = 0
-            self.rec_vol = []
-            # self.ow.set_fish_icon_visible()
-            self.rec_vol.append(error)
-
     def update(self):
         data = np.array([])
         for i in range(0, int(self.RATE / self.CHUNK * self.RECORD_SECONDS)):
             ret = self.stream.read(self.CHUNK)
             ret = np.frombuffer(ret, dtype="int16") / 32768.0
-            # self.fft_check(ret)
             data = np.concatenate([data, ret])
         vol = np.abs(data.max(initial=0))
         self.average_vol = vol / 500 + self.average_vol * 499/500
@@ -119,7 +97,7 @@ class PlotWindow:
         t = threading.currentThread()
         initial_val = 0
         before_val = 0
-        for i in range(int(self.RATE/self.CHUNK * 20)):
+        for i in range(int(self.RATE/self.CHUNK * 60)):
             data = self.stream.read(self.CHUNK)
             chunk_val = np.sum(np.abs(np.frombuffer(data, dtype="int16") / 32768.0))
             val = chunk_val + before_val
@@ -139,6 +117,7 @@ class PlotWindow:
                 break
         else:
             print('fishing: timeout!')
+            self.ps.press_key('a')
         self.ow.set_fish_icon_invisible()
 
 

@@ -22,6 +22,8 @@ class ObsWebsket:
 
         self.ws = obsws(host, port, password)
         self.ws.connect()
+
+        self.image = self.get_snap()
         size = 1920, 1080
 
 
@@ -122,6 +124,7 @@ class ObsWebsket:
                     crop_range1 = np.mean(np.asarray(gray_image.crop(candidate[i][2])))
                     ent = round(candidate[i][3], 4)
             print('\navr:{}, thr:{}, ent:{}'.format(int(crop_range1), threshold, ent))
+            # TODO: 表示画像(Aver)の縮尺比に合わせたポジショニングをする
             self.ws.call(requests.SetSceneItemPosition('red_target', x=candidate[max_i][0]*100, y=candidate[max_i][1]*100))
             self.set_icon_visible('red_target')
             # plt.imshow(croped, cmap="gray")
@@ -132,15 +135,15 @@ class ObsWebsket:
 
     # 野外にいるか
     def is_field(self):
-        image = self.get_snap()
-        boolean_list = self.detect_map(image)
+        self.image = self.get_snap()
+        boolean_list = self.detect_map()
         return all(boolean_list)
 
     # 右下の地図を検知
-    def detect_map(self, image):
+    def detect_map(self):
         threashold = 200
         map_range = (1520, 745, 1890, 1050)
-        croped = image.crop(map_range)
+        croped = self.image.crop(map_range)
         # croped.save('map_2.jpg')
         data = np.asanyarray(croped.convert('L'))
         check_1 = np.mean([data[0], data[-1]]) > threashold
@@ -149,8 +152,8 @@ class ObsWebsket:
 
         return check_1, check_2, check_3
 
-    def light_distribution(self, image):
-        gray_image = image.convert('L')
+    def light_distribution(self):
+        gray_image = self.image.convert('L')
         im_size = gray_image.size
         arr = np.array(gray_image)
         up_bot = np.array_split(arr, 2, 0)
@@ -169,15 +172,17 @@ if __name__ == '__main__':
     fig = plt.figure()
     ax = plt.axes()
     ax.set_ylim((0, 50000))
-    for _ in range(10):
+    while(1):
         image = self.get_snap()
         # line1, = ax.plot(image.convert('L').histogram(), color='gray')
-        upside = np.asarray(image.convert("RGB")).
-        img = np.asarray(image.convert("RGB")).reshape(-1, 3)
+        # img = np.asarray(image.convert("RGB")).reshape(-1, 3)
+        upside =image.convert("RGB").crop((0, 0, image.size[0], int(image.size[1]/2)))
+        # upside.show()
+        img = np.array(upside).reshape(-1, 3)
         ax.hist(img, color=["red", "green", "blue"], histtype="step", bins=256)
         plt.pause(1)
         ax.clear()
-    print(self.light_distribution(image))
+    # print(self.light_distribution(image))
 
 # i, j = 5, 5
 # crop_range1 = (i * 100, j * 100, (i + 1) * 100, (j + 1) * 100)
