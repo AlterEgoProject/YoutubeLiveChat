@@ -109,7 +109,7 @@ class PlotWindow:
                 if val > initial_val:
                     print('fishing: hit!')
                     self.ps.press_key('a')
-                    self.ow.set_fish_icon_visible()
+                    self.ow.set_icon_visible('fish')
                     time.sleep(0.5)
                     break
             if getattr(t, "do_run", False):
@@ -118,7 +118,7 @@ class PlotWindow:
         else:
             print('fishing: timeout!')
             self.ps.press_key('a')
-        self.ow.set_fish_icon_invisible()
+        self.ow.set_icon_invisible('fish')
 
 
 if __name__ == "__main__":

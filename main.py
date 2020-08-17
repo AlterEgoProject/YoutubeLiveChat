@@ -41,20 +41,23 @@ def main():
         # print(automove.zero_chat_counter)
         if automove.is_afk():
             if len(chats) == 0:
-                if automove.is_field:
+                if automove.is_field():
                     automove.afk_act()
             else:
                 automove.deactivate_afk()
 
         for chat in chats:
+            automove.zero_chat_counter = 0
             text = chat[1]
             print(text)
             # print(chat[2], text)
             if text[0] == '#':
                 continue
-            if not(automove.is_command(text)):
-                automove.end_thread()
-                ps.press_key(text)
+            if len(automove.thread_list) > 0 or len(automove.futures) > 0:
+                automove.end_thread(text)
+            else:
+                if not(automove.is_command(text)):
+                    ps.press_key(text)
 
         time.sleep(1)
         # except Exception as e:
