@@ -48,6 +48,7 @@ def main():
 
         for chat in chats:
             automove.zero_chat_counter = 0
+            ow.set_icon_invisible('learning_counter')
             text = chat[1]
             print(text)
             # print(chat[2], text)
