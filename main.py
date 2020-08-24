@@ -8,6 +8,9 @@ import threading
 import matplotlib.pyplot as plt
 import numpy as np
 
+import traceback
+
+
 ps = None
 
 
@@ -33,7 +36,7 @@ def main():
     while(1):
         # try:
         # print(gc.old_timestamp)
-        if gc.old_timestamp == None:
+        if gc.old_timestamp is None:
             gc.get()
             continue
         chats = gc.get()
@@ -54,9 +57,11 @@ def main():
             # print(chat[2], text)
             if text[0] == '#':
                 continue
-            if len(automove.thread_list) > 0 or len(automove.futures) > 0:
+            if len(automove.futures) > 0:
                 automove.end_thread(text)
             else:
+                if len(automove.thread_list) > 0:
+                    automove.end_thread(text)
                 if not(automove.is_command(text)):
                     ps.press_key(text)
 
@@ -75,6 +80,7 @@ if __name__ == '__main__':
             break
         except Exception as e:
             beep.beep(2000, 200)
+            except_str = traceback.format_exc()
             tb = sys.exc_info()[2]
             try:
                 if ps.sender.isOpened():
@@ -84,7 +90,7 @@ if __name__ == '__main__':
             print('{0}\nエラー、5秒後再起動します'.format(e.with_traceback(tb)))
             time.sleep(5)
             if flag:
-                msg = "message:{0}".format(e.with_traceback(tb))
+                msg = "message:{0}".format(except_str)
                 print(line.line(msg))
                 flag = False
                 continue

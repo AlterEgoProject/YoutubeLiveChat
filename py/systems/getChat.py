@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+import subprocess
 
 from datetime import datetime, timedelta
 import random
@@ -12,11 +13,16 @@ VALIDATE_SEC = 20
 AFK_SEC = 60
 LIMIT_MIN = 5
 
+softalkpath = 'C:\\Users\\cellolian\\Desktop\\softalk\\SofTalk.exe'
+key_list = ['a', 'b', 'x', 'y', 'q', 'w', 'e', 's', '1', '2', '3', '4', '6', '7', '8', '9', 'l', 'k', 'r', 't', 'u', 'd', 'p']
+
+
 
 class GetChat:
     def __init__(self, target_url, old_timestamp=None):
         self.random_time = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23]
-        # self.random_time = []
+        self.random_time = []
+        self.random_time = list(range(1, 25))
         self.target_url = target_url
         self.comment_data = []
         self.session = requests.Session()
@@ -30,6 +36,8 @@ class GetChat:
         self.selected_time = datetime.now()
         self.afk_time = datetime.now()
         self.ow = connectOBS.ObsWebsket()
+
+        self.softalk_flag = True
 
     def get(self):
         html = self.session.get(self.target_url, headers=self.headers)
@@ -64,15 +72,26 @@ class GetChat:
                 timestamp, text, name, name_id = self.extract_comment(samp)
 
                 # print(text)
-                if '#' in text or '＃' in text:
-                    continue
                 delta_sec = datetime.now().timestamp() - int(timestamp)/1000/1000
                 # print(temp['message']['runs'][0]['text'])
                 if delta_sec < 60 * CANTIDATE_MIN:
                     name_list.append(name)
                 # print(self.old_timestamp is None, int(self.old_timestamp) < int(timestamp))
-                if self.old_timestamp is None or int(self.old_timestamp) < int(timestamp):
+                if self.old_timestamp is None:
+                    self.old_timestamp = int(timestamp) - 1
+                if int(self.old_timestamp) < int(timestamp):
                     if name in exclude_list:
+                        continue
+                    try:
+                        if self.softalk_flag is False:
+                            if text[0] not in key_list and 'step' not in text and text not in ['go', 'back'] and 'timeskip' not in text:
+                                cmd = softalkpath + ' /W:' + text.replace('/', '')
+                                subprocess.Popen(cmd, shell=True)
+                                cmd = softalkpath + ' clear'
+                                subprocess.Popen(cmd, shell=True)
+                    except:
+                        print('error @softalk')
+                    if '#' in text or '＃' in text:
                         continue
                     # print(self.ticket is None, self.ticket == name)
                     if self.ticket is None:
@@ -93,13 +112,17 @@ class GetChat:
                         else:
                             self.ticket_flag = True
                             comment_data.append([timestamp, text, name, name_id])
-                    # self.old_timestamp = timestamp
+                    self.old_timestamp = timestamp
             except Exception as e:
                 # print(e, samp)
                 continue
         # except Exception as e:
         #     # print(e)
         #     pass
+
+        if self.softalk_flag:
+            self.softalk_flag = False
+
         self.old_timestamp = timestamp
         name_list = set(name_list)
         name_list.discard('Alter Ego Project')
@@ -180,10 +203,21 @@ class GetChat:
 #     writer = data.writer(f, lineterminator='\n')
 #     writer.writerows(comment_data)
 
+
 if __name__ == '__main__':
-    v = 'iq-CFy-4YYM'
+    import subprocess, time
+    softalkpath = 'C:\\Users\\cellolian\\Desktop\\softalk\\SofTalk.exe'
+    v = 'GeUNdV-NiqY'
     target_url = 'https://www.youtube.com/live_chat?v=' + v
-    gc = GetChat(target_url, 1597150114887955)
-    for _ in range(2):
-        print([row for row in gc.get()])
+    gc = GetChat(target_url)
+    gc.get()
+    for _ in range(100):
+        chats = gc.get()
+        for chat in chats:
+            text = chat[1]
+            cmd = softalkpath + ' /W:' + text
+            subprocess.Popen(cmd, shell=True)
+            cmd = softalkpath + ' clear'
+            subprocess.Popen(cmd, shell=True)
+            time.sleep(5)
     print()

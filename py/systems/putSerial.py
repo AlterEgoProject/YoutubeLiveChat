@@ -1,5 +1,6 @@
 import argparse
 from time import sleep
+import subprocess
 
 from py.Commands.Sender import Sender
 from py.Commands.UnitCommand import UnitCommand
@@ -66,12 +67,12 @@ class PutSerial:
         self.command.press(Direction(Stick.LEFT, 120), 3, 1)
         self.command.keys.end()
 
-    # def send(self, msg, duration=0.2):
-    #     print(msg)
-    #     self.sender.writeRow(msg)
-    #     sleep(duration)
-    #     # self.sender.writeRow(b'RELEASE\r\n')
-    #     self.sender.writeRow(b'RELEASE\r\n')
+    def send(self, msg, duration=0.2):
+        print(msg)
+        self.sender.writeRow(msg)
+        sleep(duration)
+        # self.sender.writeRow(b'RELEASE\r\n')
+        self.sender.writeRow(b'RELEASE\r\n')
 
     def press_key(self, keys):
         keys = keys.translate(ZEN2HAN).lower()
@@ -112,6 +113,44 @@ class PutSerial:
         if hold_key is not None:
             self.command.holdEnd(hold_key)
 
+    def save_game(self):
+        self.command.press(Button.MINUS)
+        for _ in range(5):
+            sleep(1)
+            self.command.press(Button.A)
+            self.command.press(Button.B)
+        sleep(5)
+
+    def change_time(self, diff):
+        self.command.press(Button.HOME, 0.1, 0.5)
+        self.command.press(Hat.BTM)
+        for _ in range(4):
+            self.command.press(Hat.RIGHT)
+        self.command.press(Button.A)  # select setting
+        self.command.press(Hat.BTM, 2)
+        self.command.press(Button.A)
+        self.command.press(Hat.BTM, 0.5)
+        self.command.press(Button.A, 0.1, 0.5)
+        self.command.press(Hat.BTM)
+        self.command.press(Hat.BTM)
+        self.command.press(Button.A)  # select time setting
+        for i in range(5):
+            for _ in range(abs(diff[i])):
+                if diff[i] > 0:
+                    self.command.press(Hat.TOP, 0.1, 0.2)
+                else:
+                    self.command.press(Hat.BTM, 0.1, 0.2)
+            self.command.press(Hat.RIGHT, 0.1, 0.2)
+        self.command.press(Button.A)
+        self.command.press(Button.HOME, 0.1, 1.0)
+        sleep(1)
+        self.command.press(Button.X, 0.1, 1.0)  # reset game
+        self.command.press(Button.A, 0.1, 2.0)
+        self.command.press(Button.A, 0.1, 2.0)
+        self.command.press(Button.A)
+        sleep(5)
+        self.command.press(Button.A)  # 保険
+        self.command.press(Button.A)
 
 # try:
 #     while True:
@@ -132,4 +171,4 @@ if __name__ == '__main__':
     while(1):
         keys = input()
         ps.press_key(keys)
-        # ps.send(keys)
+        ps.send(keys)

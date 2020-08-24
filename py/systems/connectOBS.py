@@ -30,7 +30,7 @@ class ObsWebsket:
         self.image = self.get_snap()
         size = 1920, 1080
 
-        self.sigmoid = lambda x: 1 / (1 + np.exp(-x))
+        self.sigmoid = lambda x: 1.0 / (1.0 + np.exp(-x))
         self.alpha = 0.1
         try:
             self.parameter = np.load('parameter.npy')
@@ -38,14 +38,17 @@ class ObsWebsket:
             self.parameter = np.array([
                 [1.0, -1.0, -1.0],
                 [-1.0, 1.0, -1.0],
-                [-1.0, -1.0, 1.0]])
+                [-1.0, -1.0, 1.0],
+                [0.2, 0.8, -1.0],
+                [0.5, 0.5, -1.0]])
+
         self.f_str = [
             ['砂浜', 'すなはま'],
             ['草地', 'くさち'],
-            ['水', 'みず']]
-        self.f = [0.0, 0.0, 0.0]
+            ['水', 'みず'],
+            ['れんが', ''],
+            ['木道', 'こみち']]
         self.text = None
-
 
     def now_here(self, msg):
         if msg:
@@ -158,8 +161,27 @@ class ObsWebsket:
         check_1 = np.mean([data[0], data[-1]]) > threashold
         check_2 = np.mean([data.T[0], data.T[-1]]) > threashold
         check_3 = np.mean(data) < threashold
-
         return check_1, check_2, check_3
+
+    # タイトル画面か
+    def is_title(self):
+        self.image = self.get_snap()
+        boolean_list = self.detect_title()
+        return all(boolean_list)
+
+    # 上部のロゴのどうぶつのRGBを検知
+    def detect_title(self):
+        sample_rgb = [(233, 124, 91), (62, 191, 168), (228, 103, 157), (61, 182, 241)]
+        range_list = [(430, 280, 590, 420), (615, 280, 775, 420), (800, 280, 960, 420), (990, 280, 1150, 420)]
+        threashold = 5
+        logos = [self.image.crop(r) for r in range_list]
+        rgbs = [[int(np.mean(arr)) for arr in [np.array(logos[i])[:, :, k] for k in range(3)]] for i in range(4)]
+        rgb_diff = lambda i: all([pow(sample_rgb[i][j] - rgbs[i][j], 2) < threashold for j in range(3)])
+        check_1 = rgb_diff(0)
+        check_2 = rgb_diff(1)
+        check_3 = rgb_diff(2)
+        check_4 = rgb_diff(3)
+        return check_1, check_2, check_3, check_4
 
     def light_distribution(self):
         gray_image = self.image.convert('L')
@@ -257,23 +279,31 @@ class ObsWebsket:
                     best_mean = np.array([np.mean(arr) for arr in temp])
                     std_flag = False
         if std_flag:
+            print('いい感じの地形がないよ！')
             return None
         # print(min_std, best_mean)
         self.put_target(best_i, best_j)
         # self.learning.hx(best_mean)
-        f = self.sigmoid(np.sum(best_mean * self.parameter, axis=1))
+        x = np.array([np.dot(best_mean, self.parameter[i]) for i in range(len(self.parameter))])
+        f = self.sigmoid(x)
         max_index = np.argmax(f)
+        # print(best_mean)
+        # print(x)
+        # print(f)
+        # print(best_mean * self.parameter)
         ans = self.show_question(max_index)
         print('question: end!')
         # self.learning.update(best_mean, ans)
-        y = np.zeros(3)
-        y[max_index] = 1.0
+        y = np.zeros(len(self.parameter))
         if ans:
-            self.parameter -= self.alpha * (self.parameter * best_mean).T * (self.f - y)
-        elif ans is False:
-            self.parameter[max_index] -= self.alpha * (self.parameter[max_index] * best_mean).T * (self.f - y)
+            y[max_index] = 1.0
+        delta = (f - y) * f * (1 - f)
+        if ans:
+            for i in range(len(self.parameter)):
+                self.parameter[i] -= self.alpha * delta[i] * best_mean
         else:
-            return None
+            self.parameter[max_index] -= 10 * self.alpha * delta[max_index] * best_mean
+        # print(self.parameter)
         np.save('parameter', self.parameter)
         return ans
 
@@ -285,7 +315,7 @@ class ObsWebsket:
         self.set_text('talk_rubi2', self.f_str[index][1])
         for name in talk_items:
             self.set_icon_visible(name)
-        for i in range(60):
+        for i in range(200):
             if self.text is not None:
                 for name in talk_items:
                     self.set_icon_invisible(name)
@@ -304,14 +334,16 @@ class ObsWebsket:
         for name in talk_items:
             self.set_icon_invisible(name)
         self.set_icon_invisible('red_target')
+        self.set_icon_invisible('learning_counter')
         return None
 
 
 if __name__ == '__main__':
     self = ObsWebsket()
-    learning = systems.Learning()
+    # learning = systems.Learning()
     while(1):
-        self.test()
+        self.is_title()
+        time.sleep(1)
     print()
     # self.draw_color_histogram()
     # self.draw_mono_color()
